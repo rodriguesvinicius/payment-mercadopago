@@ -46,6 +46,8 @@ app.get("/pagar", async (req, res) => {
 
 })
 
-app.listen(3000, (req, res) => {
+const PORT = process.env.PORT || 8081
+
+app.listen(PORT, (req, res) => {
     console.log("Servidor rodando")
 })
