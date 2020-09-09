@@ -48,7 +48,7 @@ app.get("/pagar", async (req, res) => {
 
 app.post("/not" , (req,res)=>{
     console.log(req.query);
-    res.send(ok);
+    res.send("OK");
 })
 
 const PORT = process.env.PORT || 8081
