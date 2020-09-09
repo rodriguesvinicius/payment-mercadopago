@@ -52,14 +52,20 @@ app.post("/not", (req, res) => {
     setTimeout(() => {
 
         var filtro = {
-            "order.id" : id
+            "order.id": id
         }
-        
+
         MercadoPago.payment.search({
-            qs:filtro
-        }).then((data)=>{
+            qs: filtro
+        }).then((data) => {
+            var pagamento = data.body.result[0];
+            if (pagamento != undefined) {
+                console.log(pagamento)
+            } else {
+                console.log("Pagamento não existe")
+            }
             console.log(data)
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log(err)
         })
 
