@@ -1,6 +1,5 @@
 const express = require("express")
 const MercadoPago = require("mercadopago");
-const { ftruncate } = require("fs");
 const app = express();
 
 MercadoPago.configure({
