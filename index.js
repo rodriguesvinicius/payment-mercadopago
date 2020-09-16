@@ -31,7 +31,18 @@ app.get("/pagar", async (req, res) => {
             email: emailPagador
         },
         //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
-        external_reference: id
+        external_reference: id,
+
+        preference = {
+            // ...
+            "back_urls": {
+                  "success": "https://apimercadopago.herokuapp.com",
+                  "failure": "https://apimercadopago.herokuapp.com/falha",
+                  "pending": "https://apimercadopago.herokuapp.com/pendente"
+              },
+              "auto_return": "approved",
+            // ...
+          }
 
     }
 
