@@ -17,7 +17,7 @@ app.get("/pagar", async (req, res) => {
     var emailPagador = "vinizika231199@gmail.com"
 
     var preference = {}
-  
+
 
     const dados = {
         items: [
@@ -36,16 +36,13 @@ app.get("/pagar", async (req, res) => {
         //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
         external_reference: id,
 
-        preference = {
-            // ...
-            "back_urls": {
-                "success": "https://apimercadopago.herokuapp.com",
-                "failure": "https://apimercadopago.herokuapp.com/falha",
-                "pending": "https://apimercadopago.herokuapp.com/pendente"
-            },
-            "auto_return": "approved",
-            // ...
-        }
+        back_urls: {
+            "success": "https://apimercadopago.herokuapp.com",
+            "failure": "https://apimercadopago.herokuapp.com/falha",
+            "pending": "https://apimercadopago.herokuapp.com/pendente"
+        },
+        auto_return: "approved",
+
 
     }
 
