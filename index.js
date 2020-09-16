@@ -16,6 +16,9 @@ app.get("/pagar", async (req, res) => {
     var id = " " + Date.now();
     var emailPagador = "vinizika231199@gmail.com"
 
+    var preference = {}
+  
+
     const dados = {
         items: [
             item = {
@@ -36,13 +39,13 @@ app.get("/pagar", async (req, res) => {
         preference = {
             // ...
             "back_urls": {
-                  "success": "https://apimercadopago.herokuapp.com",
-                  "failure": "https://apimercadopago.herokuapp.com/falha",
-                  "pending": "https://apimercadopago.herokuapp.com/pendente"
-              },
-              "auto_return": "approved",
+                "success": "https://apimercadopago.herokuapp.com",
+                "failure": "https://apimercadopago.herokuapp.com/falha",
+                "pending": "https://apimercadopago.herokuapp.com/pendente"
+            },
+            "auto_return": "approved",
             // ...
-          }
+        }
 
     }
 
@@ -72,7 +75,7 @@ app.post("/not", (req, res) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
                 console.log(pagamento)
-               // console.log(pagamento.status)
+                // console.log(pagamento.status)
                 //console.log(pagamento.external_reference)
             } else {
                 console.log("Pagamento não existe")
