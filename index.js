@@ -34,48 +34,50 @@ app.post("/createUser", (req, res) => {
 app.get("/pagar/:id", async (req, res) => {
 
     connection.from('Merchant')
-        .where('idUser', '=', req.params.id)
-        .then((usuario) => {
+    .where('idUser', '=' , req.params.id)
+    .then((usuario)=>{
+        
+    })
 
-            var id = usuario.idUser
-            var emailPagador = usuario.emailUser
+    var id = " " + Date.now();
+    var emailPagador = "vinizika231199@gmail.com"
 
-            const dados = {
-                items: [
-                    item = {
-                        id: id,
-                        title: "Adicionando dinheiro na carteira",
-                        quantity: 1,
-                        currency_id: 'BRL',
-                        unit_price: parseFloat(150)
-                    }
-                ],
-
-                payer: {
-                    email: emailPagador
-                },
-                //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
-                external_reference: id,
-
-                back_urls: {
-                    "success": "https://apimercadopago.herokuapp.com",
-                    "failure": "https://apimercadopago.herokuapp.com/falha",
-                    "pending": "https://apimercadopago.herokuapp.com/pendente"
-                },
-                auto_return: "approved",
-
-
+    const dados = {
+        items: [
+            item = {
+                id: id,
+                title: "2x video games; 3x camisas",
+                quantity: 1,
+                currency_id: 'BRL',
+                unit_price: parseFloat(150)
             }
+        ],
 
-            try {
-                var pagamento = await MercadoPago.preferences.create(dados);
-                console.log(pagamento);
-                //Banco.salvarPagamento() nesse momento salvar os dados do pagador id e email
-                return res.redirect(pagamento.body.init_point);
-            } catch (error) {
-                return res.send(error.message)
-            }
-        })
+        payer: {
+            email: emailPagador
+        },
+        //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
+        external_reference: id,
+
+        back_urls: {
+            "success": "https://apimercadopago.herokuapp.com",
+            "failure": "https://apimercadopago.herokuapp.com/falha",
+            "pending": "https://apimercadopago.herokuapp.com/pendente"
+        },
+        auto_return: "approved",
+
+
+    }
+
+    try {
+        var pagamento = await MercadoPago.preferences.create(dados);
+        //console.log(pagamento);
+        //Banco.salvarPagamento() nesse momento salvar os dados do pagador id e email
+        return res.redirect(pagamento.body.init_point);
+    } catch (error) {
+        return res.send(error.message)
+    }
+
 })
 
 app.post("/not", (req, res) => {
@@ -92,7 +94,7 @@ app.post("/not", (req, res) => {
         }).then((data) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
-                //console.log(pagamento)
+                console.log(pagamento)
                 // console.log(pagamento.status)
                 //console.log(pagamento.external_reference)
             } else {
