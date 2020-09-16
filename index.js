@@ -33,51 +33,55 @@ app.post("/createUser", (req, res) => {
 
 app.get("/pagar/:id", async (req, res) => {
 
+    const id = ""
+    const emailPagador = "";
+
     connection.from('Merchant')
-    .where('idUser', '=' , req.params.id)
-    .then((usuario)=>{
-        
-    })
+        .where('idUser', '=', req.params.id)
+        .then((usuario) => {
+            this.id = usuario.idUser
+            this.emailPagador = usuario.emailUser
+        })
 
-    var id = " " + Date.now();
-    var emailPagador = "vinizika231199@gmail.com"
+    if (id != undefined || id != null) {
+        res.send("não é possivel criar uma transação nesse momento")
+    } else {
+        const dados = {
+            items: [
+                item = {
+                    id: id,
+                    title: "Adição de fundos",
+                    quantity: 1,
+                    currency_id: 'BRL',
+                    unit_price: parseFloat(150)
+                }
+            ],
 
-    const dados = {
-        items: [
-            item = {
-                id: id,
-                title: "2x video games; 3x camisas",
-                quantity: 1,
-                currency_id: 'BRL',
-                unit_price: parseFloat(150)
-            }
-        ],
+            payer: {
+                email: emailPagador
+            },
+            //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
+            external_reference: id,
 
-        payer: {
-            email: emailPagador
-        },
-        //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
-        external_reference: id,
-
-        back_urls: {
-            "success": "https://apimercadopago.herokuapp.com",
-            "failure": "https://apimercadopago.herokuapp.com/falha",
-            "pending": "https://apimercadopago.herokuapp.com/pendente"
-        },
-        auto_return: "approved",
+            back_urls: {
+                "success": "https://apimercadopago.herokuapp.com",
+                "failure": "https://apimercadopago.herokuapp.com/falha",
+                "pending": "https://apimercadopago.herokuapp.com/pendente"
+            },
+            auto_return: "approved",
 
 
+        }
+
+        try {
+            var pagamento = await MercadoPago.preferences.create(dados);
+            console.log("aquiii" + pagamento);
+            //Banco.salvarPagamento() nesse momento salvar os dados do pagador id e email
+            return res.redirect(pagamento.body.init_point);
+        } catch (error) {
+            return res.send(error.message)
+        }
     }
-
-    try {
-        var pagamento = await MercadoPago.preferences.create(dados);
-        //console.log(pagamento);
-        //Banco.salvarPagamento() nesse momento salvar os dados do pagador id e email
-        return res.redirect(pagamento.body.init_point);
-    } catch (error) {
-        return res.send(error.message)
-    }
-
 })
 
 app.post("/not", (req, res) => {
