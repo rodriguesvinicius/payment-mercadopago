@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const connection = require('./config/connection');
 const { transaction } = require("./config/connection");
+const { Connection } = require("pg");
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -136,18 +137,9 @@ app.post("/not", (req, res) => {
                 console.log(pagamento)
                 console.log("EXTERNMALLLLL" + pagamento.external_reference)
                 connection.select().table('transaction')
-                    .where("externalReference" + "=" + `"${pagamento.external_reference}"`)
-                    .then((transaction) => {
-                        if (transaction) {
-                            if (pagamento.status == "aprroved") {
-                               console.log("Pagamento aprovado")
-                            } else {
-                                console.log("pedido pendente")
-                            }
-                        }
-                    }).catch((err) => {
-                        console.log(err)
-                    })
+                .where("externalReference" + "=" + pagamento.external_reference).then((transaction)=>{
+                    console.log(transaction)
+                })
             } else {
                 console.log("Pagamento não existe")
             }
