@@ -54,7 +54,7 @@ app.get("/wallet/:id", (req, res) => {
         })
 })
 
-app.get("/pagar/:id", (req, res) => {
+app.get("/pagar/:id", async (req, res) => {
 
     var dados = {}
     var trataDados = []
@@ -62,9 +62,9 @@ app.get("/pagar/:id", (req, res) => {
     var idUsuario = null;
 
     console.log(req.params.id)
-    connection.select().table('Merchant')
+    await connection.select().table('Merchant')
         .where('idUser', '=', req.params.id)
-        .then((usuario) => {
+        .then(async (usuario) => {
             if (usuario) {
                 usuario.forEach(data => {
                     idUsuario = data.idUser
@@ -96,7 +96,7 @@ app.get("/pagar/:id", (req, res) => {
                 });
 
                 try {
-                    MercadoPago.preferences.create(dados).then((data) => {
+                    await MercadoPago.preferences.create(dados).then(async (data) => {
                         var unit_price = 0;
                         var description = '';
                         var external_reference = null;
@@ -110,7 +110,7 @@ app.get("/pagar/:id", (req, res) => {
                         });
                         console.log("dwadawd" + external_reference)
                         console.log("itemsss" + unit_price)
-                        connection.insert({
+                        await connection.insert({
                             amount: unit_price,
                             status: 'pedding',
                             description: description,
@@ -150,19 +150,19 @@ app.post("/not", (req, res) => {
 
         MercadoPago.payment.search({
             qs: filtro
-        }).then((data) => {
+        }).then(async (data) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
                 console.log(pagamento)
-                connection.select().table('transaction')
-                    .where("externalReference", "=", pagamento.external_reference.toString()).then((transaction) => {
+                await connection.select().table('transaction')
+                    .where("externalReference", "=", pagamento.external_reference.toString()).then(async (transaction) => {
                         if (transaction) {
                             if (pagamento.status == "approved") {
-                                connection.table('transaction').update({
+                                await connection.table('transaction').update({
                                     status: 'approved'
-                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(() => {
+                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(async () => {
                                     console.log("Transação atualizada com sucesso")
-                                    connection.table('Merchant')
+                                    await connection.table('Merchant')
                                         .where('idUser', "=", 1)
                                         .increment('amount', pagamento.transaction_amount)
 
