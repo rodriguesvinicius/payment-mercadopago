@@ -3,7 +3,8 @@ const MercadoPago = require("mercadopago");
 const app = express();
 const bodyParser = require('body-parser')
 const session = require('express-session')
-const connection = require('./config/connection')
+const connection = require('./config/connection');
+const { transaction } = require("./config/connection");
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -43,7 +44,7 @@ app.get("/pagar/:id", async (req, res) => {
     console.log(req.params.id)
     await connection.select().table('Merchant')
         .where('idUser', '=', req.params.id)
-        .then(async(usuario) => {
+        .then(async (usuario) => {
             if (usuario) {
                 usuario.forEach(async data => {
                     idUsuario = data.idUser
@@ -133,8 +134,22 @@ app.post("/not", (req, res) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
                 console.log(pagamento)
-                // console.log(pagamento.status)
-                //console.log(pagamento.external_reference)
+                connection.select().table('transaction')
+                    .where("externalReference" + "=" + pagamento.external_reference)
+                    .then(async (transaction) => {
+                        if (transaction) {
+                            if (pagamento.status == "aprroved") {
+                                await connection('transaction')
+                                    .update({
+                                        status: 'approved'
+                                    }).where('externalReference' + "=" + pagamento.external_reference)
+                            } else {
+                                console.log("pedido pendente")
+                            }
+                        }
+                    }).catch((err)=>{
+                        console.log(err)
+                    })
             } else {
                 console.log("Pagamento não existe")
             }
