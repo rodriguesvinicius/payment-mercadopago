@@ -141,13 +141,25 @@ app.post("/not", (req, res) => {
 
         MercadoPago.payment.search({
             qs: filtro
-        }).then((data) => {
+        }).then(async (data) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
                 console.log(pagamento)
-                connection.select().table('transaction')
-                    .where("externalReference", "=", pagamento.external_reference.toString()).then((transaction) => {
-                        console.log(transaction)
+                await connection.select().table('transaction')
+                    .where("externalReference", "=", pagamento.external_reference.toString()).then(async (transaction) => {
+                        if (transaction) {
+                            if (pagamento.status == "approved") {
+                                await connection.table('transaction').update({
+                                    status: 'approved'
+                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(() => {
+                                    console.log("Transação atualizada com sucesso")
+                                }).catch((err) => {
+                                    console.log(err);
+                                })
+                            } else {
+                                console.log("transação pendente")
+                            }
+                        }
                     }).catch((err) => {
                         console.log("ERROU" + err)
                     })
