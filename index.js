@@ -134,20 +134,24 @@ app.post("/not", (req, res) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
                 console.log(pagamento)
+                console.log("EXTERNMALLLLL" + pagamento.external_reference)
                 connection.select().table('transaction')
-                    .where("externalReference" + "=" + pagamento.external_reference)
-                    .then(async (transaction) => {
+                    .where("externalReference" + "=" + `"${pagamento.external_reference}"`)
+                    .then((transaction) => {
                         if (transaction) {
                             if (pagamento.status == "aprroved") {
-                                await connection.table('transaction')
-                                    .update({
-                                        status: 'approved'
-                                    }).where('externalReference' + "=" + pagamento.external_reference)
+                                connection.update({ status: 'approved' })
+                                    .table('transaction')
+                                    .where('externalReference' + '=' + `"${pagamento.external_reference}"`).then(() => {
+                                        console.log("pedido atualizado com sucesso")
+                                    }).catch((err) => {
+                                        console.log(err)
+                                    })
                             } else {
                                 console.log("pedido pendente")
                             }
                         }
-                    }).catch((err)=>{
+                    }).catch((err) => {
                         console.log(err)
                     })
             } else {
