@@ -138,7 +138,7 @@ app.post("/not", (req, res) => {
                 console.log(pagamento)
                 console.log("EXTERNMALLLLL" + pagamento.external_reference)
                 connection.select().table('transaction')
-                    .where("externalReference" + "=" + externalReference).then((transaction) => {
+                    .where("idUser" + "=" + 1).then((transaction) => {
                         console.log(transaction)
                     }).catch((err) => {
                         console.log("ERROU" + err)
