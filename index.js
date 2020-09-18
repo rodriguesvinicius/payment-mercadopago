@@ -35,6 +35,16 @@ app.post("/createUser", (req, res) => {
         })
 })
 
+app.get("/teste", (req, res) => {
+    var externalReference = 1600465370571
+    connection.select().table('transaction')
+        .where("externalReference", "=", externalReference.toString()).then((transaction) => {
+            console.log(transaction)
+        }).catch((err) => {
+            console.log("ERROU" + err)
+        })
+})
+
 app.get("/pagar/:id", async (req, res) => {
 
     var dados = {}
@@ -136,7 +146,7 @@ app.post("/not", (req, res) => {
             if (pagamento != undefined) {
                 console.log(pagamento)
                 connection.select().table('transaction')
-                    .where("idUser", "=", pagamento.external_reference).then((transaction) => {
+                    .where("externalReference", "=", pagamento.external_reference.toString()).then((transaction) => {
                         console.log(transaction)
                     }).catch((err) => {
                         console.log("ERROU" + err)
