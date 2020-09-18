@@ -28,60 +28,94 @@ app.post("/createUser", (req, res) => {
     }).into('Merchant')
         .then(() => {
             res.send("Usuario cadastrado com sucesso")
+        }).catch((err) => {
+            console.log(err)
         })
 })
 
 app.get("/pagar/:id", async (req, res) => {
 
-    const id = ""
-    const emailPagador = "";
+    var dados = {}
+    var trataDados = []
+    var itemsPedido = []
+    var idUsuario = null;
 
-    connection.from('Merchant')
+    console.log(req.params.id)
+    await connection.select().table('Merchant')
         .where('idUser', '=', req.params.id)
-        .then((usuario) => {
-            this.id = usuario.idUser
-            this.emailPagador = usuario.emailUser
+        .then(async(usuario) => {
+            if (usuario) {
+                usuario.forEach(async data => {
+                    idUsuario = data.idUser
+                    dados = {
+                        items: [
+                            item = {
+                                id: 1,
+                                title: "Adição de fundos",
+                                quantity: 1,
+                                currency_id: 'BRL',
+                                unit_price: parseFloat(150)
+                            }
+                        ],
+
+                        payer: {
+                            email: data.emailUser.toString()
+                        },
+                        //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
+                        external_reference: " " + Date.now(),
+
+                        back_urls: {
+                            "success": "https://apimercadopago.herokuapp.com",
+                            "failure": "https://apimercadopago.herokuapp.com/falha",
+                            "pending": "https://apimercadopago.herokuapp.com/pendente"
+                        },
+                        auto_return: "approved",
+
+                    }
+                });
+
+                try {
+                    await MercadoPago.preferences.create(dados).then(async (data) => {
+                        var unit_price = 0;
+                        var description = '';
+                        var external_reference = null;
+                        trataDados.push(dados)
+                        trataDados.forEach(element => {
+                            external_reference = element.external_reference
+                            element.items.forEach(element => {
+                                unit_price = element.unit_price
+                                description = element.title
+                            });
+                        });
+                        console.log("dwadawd" + external_reference)
+                        console.log("itemsss" + unit_price)
+                        await connection.insert({
+                            amount: unit_price,
+                            status: 'pedding',
+                            description: description,
+                            externalReference: external_reference,
+                            idUser: idUsuario
+                        }).into('transaction')
+                            .then(() => {
+                                console.log("Transação criada com sucesso")
+                            }).catch((err) => {
+                                console.log(err)
+                            })
+                        return res.redirect(data.body.init_point);
+                    });
+
+                } catch (error) {
+                    return res.send(error.message)
+                }
+
+            } else {
+                console.log("não foi poossivel achar o usuario")
+            }
+        }).catch((err) => {
+            console.log(err)
         })
 
-    if (id != undefined || id != null) {
-        res.send("não é possivel criar uma transação nesse momento")
-    } else {
-        const dados = {
-            items: [
-                item = {
-                    id: id,
-                    title: "Adição de fundos",
-                    quantity: 1,
-                    currency_id: 'BRL',
-                    unit_price: parseFloat(150)
-                }
-            ],
 
-            payer: {
-                email: emailPagador
-            },
-            //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
-            external_reference: id,
-
-            back_urls: {
-                "success": "https://apimercadopago.herokuapp.com",
-                "failure": "https://apimercadopago.herokuapp.com/falha",
-                "pending": "https://apimercadopago.herokuapp.com/pendente"
-            },
-            auto_return: "approved",
-
-
-        }
-
-        try {
-            var pagamento = await MercadoPago.preferences.create(dados);
-            console.log("aquiii" + pagamento);
-            //Banco.salvarPagamento() nesse momento salvar os dados do pagador id e email
-            return res.redirect(pagamento.body.init_point);
-        } catch (error) {
-            return res.send(error.message)
-        }
-    }
 })
 
 app.post("/not", (req, res) => {

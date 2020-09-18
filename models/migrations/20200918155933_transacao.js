@@ -7,7 +7,8 @@ exports.up = function(knex) {
         table.string('description').notNullable();
         table.string('paymentMethod').notNullable();
         table.string('currencyId');
-        table.integer('externalReference').references('idUser').inTable('Merchant');
+        table.integer('externalReference').notNullable();
+        table.integer('idUser').references('idUser').inTable('Merchant');
     })
 };
 
