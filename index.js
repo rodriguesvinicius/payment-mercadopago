@@ -134,11 +134,9 @@ app.post("/not", (req, res) => {
         }).then((data) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
-                var externalReference = "" + pagamento.externalReference;
                 console.log(pagamento)
-                console.log("EXTERNMALLLLL" + pagamento.external_reference)
                 connection.select().table('transaction')
-                    .where("idUser" + "=" + 1).then((transaction) => {
+                    .where("idUser", "=", pagamento.external_reference).then((transaction) => {
                         console.log(transaction)
                     }).catch((err) => {
                         console.log("ERROU" + err)
