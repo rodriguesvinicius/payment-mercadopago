@@ -139,7 +139,7 @@ app.post("/not", (req, res) => {
                     .then(async (transaction) => {
                         if (transaction) {
                             if (pagamento.status == "aprroved") {
-                                await connection('transaction')
+                                await connection.table('transaction')
                                     .update({
                                         status: 'approved'
                                     }).where('externalReference' + "=" + pagamento.external_reference)
