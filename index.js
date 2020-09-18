@@ -54,7 +54,7 @@ app.get("/wallet/:id", (req, res) => {
         })
 })
 
-app.get("/pagar/:id", async (req, res) => {
+app.get("/pagar/:id/:valor", async (req, res) => {
 
     var dados = {}
     var trataDados = []
@@ -75,7 +75,7 @@ app.get("/pagar/:id", async (req, res) => {
                                 title: "Adição de fundos",
                                 quantity: 1,
                                 currency_id: 'BRL',
-                                unit_price: parseFloat(150)
+                                unit_price: parseFloat(req.params.valor)
                             }
                         ],
 
