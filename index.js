@@ -64,7 +64,7 @@ app.get("/pagar/:id", async (req, res) => {
                             email: data.emailUser.toString()
                         },
                         //é o campo que vamos consultar quando o mercado pago mandar que  o pagamento foi concluido
-                        external_reference: " " + Date.now(),
+                        external_reference: "" + Date.now(),
 
                         back_urls: {
                             "success": "https://apimercadopago.herokuapp.com",
@@ -134,15 +134,15 @@ app.post("/not", (req, res) => {
         }).then((data) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
-                var externalReference = " "+pagamento.externalReference;
+                var externalReference = "" + pagamento.externalReference;
                 console.log(pagamento)
                 console.log("EXTERNMALLLLL" + pagamento.external_reference)
                 connection.select().table('transaction')
-                .where("externalReference" + "=" + externalReference).then((transaction)=>{
-                    console.log(transaction)
-                }).catch((err)=>{
-                    console.log("ERROU"+err)
-                })
+                    .where("externalReference" + "=" + externalReference).then((transaction) => {
+                        console.log(transaction)
+                    }).catch((err) => {
+                        console.log("ERROU" + err)
+                    })
             } else {
                 console.log("Pagamento não existe")
             }
