@@ -45,6 +45,13 @@ app.get("/teste", (req, res) => {
         })
 })
 
+app.get("/wallet/:id", async (req, res) => {
+    connection.from('transaction')
+        .innerJoin('Merchant', 'transaction.idUser', 'Merchant.idUser')
+
+
+})
+
 app.get("/pagar/:id", async (req, res) => {
 
     var dados = {}
@@ -151,8 +158,12 @@ app.post("/not", (req, res) => {
                             if (pagamento.status == "approved") {
                                 await connection.table('transaction').update({
                                     status: 'approved'
-                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(() => {
+                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(async () => {
                                     console.log("Transação atualizada com sucesso")
+                                    await connection.table('Merchant')
+                                    .where('idUser', "=", 1)
+                                    .increment('amount',pagamento.transaction_amount)
+
                                 }).catch((err) => {
                                     console.log(err);
                                 })
