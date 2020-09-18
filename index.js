@@ -45,14 +45,16 @@ app.get("/teste", (req, res) => {
         })
 })
 
-app.get("/wallet/:id", async (req, res) => {
-    connection.from('transaction')
-        .innerJoin('Merchant', 'transaction.idUser', 'Merchant.idUser')
-
-
+app.get("/wallet/:id", (req, res) => {
+    connection.select().table("Merchant")
+        .where("idUser", "=", req.params.id).then((result) => {
+            res.send(result)
+        }).catch((err) => {
+            console.log(err);
+        })
 })
 
-app.get("/pagar/:id", async (req, res) => {
+app.get("/pagar/:id", (req, res) => {
 
     var dados = {}
     var trataDados = []
@@ -60,11 +62,11 @@ app.get("/pagar/:id", async (req, res) => {
     var idUsuario = null;
 
     console.log(req.params.id)
-    await connection.select().table('Merchant')
+    connection.select().table('Merchant')
         .where('idUser', '=', req.params.id)
-        .then(async (usuario) => {
+        .then((usuario) => {
             if (usuario) {
-                usuario.forEach(async data => {
+                usuario.forEach(data => {
                     idUsuario = data.idUser
                     dados = {
                         items: [
@@ -94,7 +96,7 @@ app.get("/pagar/:id", async (req, res) => {
                 });
 
                 try {
-                    await MercadoPago.preferences.create(dados).then(async (data) => {
+                    MercadoPago.preferences.create(dados).then((data) => {
                         var unit_price = 0;
                         var description = '';
                         var external_reference = null;
@@ -108,7 +110,7 @@ app.get("/pagar/:id", async (req, res) => {
                         });
                         console.log("dwadawd" + external_reference)
                         console.log("itemsss" + unit_price)
-                        await connection.insert({
+                        connection.insert({
                             amount: unit_price,
                             status: 'pedding',
                             description: description,
@@ -148,21 +150,21 @@ app.post("/not", (req, res) => {
 
         MercadoPago.payment.search({
             qs: filtro
-        }).then(async (data) => {
+        }).then((data) => {
             var pagamento = data.body.results[0];
             if (pagamento != undefined) {
                 console.log(pagamento)
-                await connection.select().table('transaction')
-                    .where("externalReference", "=", pagamento.external_reference.toString()).then(async (transaction) => {
+                connection.select().table('transaction')
+                    .where("externalReference", "=", pagamento.external_reference.toString()).then((transaction) => {
                         if (transaction) {
                             if (pagamento.status == "approved") {
-                                await connection.table('transaction').update({
+                                connection.table('transaction').update({
                                     status: 'approved'
-                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(async () => {
+                                }).where("externalReference", "=", pagamento.external_reference.toString()).then(() => {
                                     console.log("Transação atualizada com sucesso")
-                                    await connection.table('Merchant')
-                                    .where('idUser', "=", 1)
-                                    .increment('amount',pagamento.transaction_amount)
+                                    connection.table('Merchant')
+                                        .where('idUser', "=", 1)
+                                        .increment('amount', pagamento.transaction_amount)
 
                                 }).catch((err) => {
                                     console.log(err);
