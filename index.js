@@ -140,13 +140,7 @@ app.post("/not", (req, res) => {
                     .then((transaction) => {
                         if (transaction) {
                             if (pagamento.status == "aprroved") {
-                                connection.update({ status: 'approved' })
-                                    .table('transaction')
-                                    .where('externalReference' + '=' + `"${pagamento.external_reference}"`).then(() => {
-                                        console.log("pedido atualizado com sucesso")
-                                    }).catch((err) => {
-                                        console.log(err)
-                                    })
+                               console.log("Pagamento aprovado")
                             } else {
                                 console.log("pedido pendente")
                             }
