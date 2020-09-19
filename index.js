@@ -163,7 +163,7 @@ app.post("/not", (req, res) => {
                                 }).where("externalReference", "=", pagamento.external_reference.toString()).then(async () => {
                                     console.log("Transação atualizada com sucesso")
                                     await connection.table('Merchant')
-                                        .where('idUser', "=", 1)
+                                        .where('idUser', "=", transaction.idUser)
                                         .increment('amount', pagamento.transaction_amount)
 
                                 }).catch((err) => {
