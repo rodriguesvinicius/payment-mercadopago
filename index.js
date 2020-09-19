@@ -163,7 +163,9 @@ app.post("/not", (req, res) => {
                                     idUser = data.idUser
                                 });
                                 await connection.table('transaction').update({
-                                    status: 'approved'
+                                    status: 'approved',
+                                    paymentMethod: pagamento.payment_method_id,
+                                    currencyId: currency_id
                                 }).where("externalReference", "=", pagamento.external_reference.toString()).then(async () => {
                                     await connection.table('Merchant')
                                         .where('idUser', "=", idUser)
