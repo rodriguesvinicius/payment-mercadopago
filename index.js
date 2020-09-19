@@ -158,13 +158,20 @@ app.post("/not", (req, res) => {
                     .where("externalReference", "=", pagamento.external_reference.toString()).then(async (transaction) => {
                         if (transaction) {
                             if (pagamento.status == "approved") {
+                                var idUser = null;
+                                transaction.forEach(data => {
+                                    idUser = data.idUser
+                                });
                                 await connection.table('transaction').update({
                                     status: 'approved'
                                 }).where("externalReference", "=", pagamento.external_reference.toString()).then(async () => {
-                                    console.log("Transação atualizada com sucesso")
                                     await connection.table('Merchant')
-                                        .where('idUser', "=", transaction.idUser)
-                                        .increment('amount', pagamento.transaction_amount)
+                                        .where('idUser', "=", idUser)
+                                        .increment('amount', pagamento.transaction_amount).then(() => {
+                                            console.log("Transação atualizada com sucesso")
+                                        }).catch((err) => {
+                                            console.log(err)
+                                        })
 
                                 }).catch((err) => {
                                     console.log(err);
